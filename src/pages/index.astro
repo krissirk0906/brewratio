@@ -28,9 +28,9 @@ const jsonLd = [
   <!-- Hero Header -->
   <section class="hero wrap">
     <div class="hero-badge">☕ Specialty Coffee Math & Pulse Pour Timer</div>
-    <h1>Chuẩn Tỷ Lệ Pha Cà Phê & Bộ Đếm Rót Nước</h1>
+    <h1>Precision Coffee Ratio Calculator & Pour Timer</h1>
     <p>
-      Tính toán chuẩn xác lượng bột, lượng nước và kế hoạch rót phân tầng (Pulse Pouring / 4:6) theo chuẩn SCA Golden Cup. 100% client-side, chuông âm thanh Web Audio mượt mà.
+      Dial in the exact brew ratio, dose, and water weight to SCA Golden Cup standards. Includes a real-time pulse pour timer with zero external dependencies and synthesized Web Audio chimes.
     </p>
   </section>
 
@@ -38,19 +38,31 @@ const jsonLd = [
   <section id="calculator" class="wrap calc-container">
     <!-- Left: Inputs & Method Selector -->
     <div class="card">
-      <h2 class="card-title">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        1. Chọn Phương Pháp Pha
-      </h2>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 class="card-title" style="margin-bottom:0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          1. Select Brewing Method
+        </h2>
+
+        <!-- Units Toggle for US/UK -->
+        <div style="display:flex; gap:4px; background:var(--color-surface-subtle); padding:3px; border-radius:20px; border:1px solid var(--color-border);" role="radiogroup" aria-label="Units">
+          <button type="button" class="pill-btn active" data-unit="metric" style="padding:4px 10px; font-size:0.75rem;">
+            Metric (g)
+          </button>
+          <button type="button" class="pill-btn" data-unit="imperial" style="padding:4px 10px; font-size:0.75rem;">
+            US Customary (oz)
+          </button>
+        </div>
+      </div>
 
       <div class="form-group">
-        <label class="form-label">Dụng cụ pha chế:</label>
-        <div class="method-pills" role="radiogroup" aria-label="Phương pháp pha chế">
+        <label class="form-label">Brewing Equipment:</label>
+        <div class="method-pills" role="radiogroup" aria-label="Brew Method">
           <button type="button" class="pill-btn active" data-method="v60">
-            <span>🌪️</span> V60 / Pour
+            <span>🌪️</span> V60 / Pour-Over
           </button>
           <button type="button" class="pill-btn" data-method="french_press">
             <span>🫖</span> French Press
@@ -61,11 +73,14 @@ const jsonLd = [
           <button type="button" class="pill-btn" data-method="chemex">
             <span>⌛</span> Chemex
           </button>
-          <button type="button" class="pill-btn" data-method="vietnamese_phin">
-            <span>🏮</span> Phin Việt
+          <button type="button" class="pill-btn" data-method="drip_machine">
+            <span>☕</span> Auto Drip
           </button>
           <button type="button" class="pill-btn" data-method="cold_brew">
             <span>🧊</span> Cold Brew
+          </button>
+          <button type="button" class="pill-btn" data-method="vietnamese_phin">
+            <span>🏮</span> Phin Drip
           </button>
           <button type="button" class="pill-btn" data-method="espresso">
             <span>⚡</span> Espresso
@@ -74,22 +89,22 @@ const jsonLd = [
       </div>
 
       <div class="form-group" style="margin-top: 24px;">
-        <label class="form-label">Bạn muốn tính theo tiêu chí nào?</label>
+        <label class="form-label">Calculation Mode:</label>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button type="button" class="pill-btn active" data-mode="by_coffee" style="flex:1;">
-            Cân cà phê bột
+            By Coffee Dose
           </button>
           <button type="button" class="pill-btn" data-mode="by_water" style="flex:1;">
-            Tổng lượng nước
+            By Water to Pour
           </button>
           <button type="button" class="pill-btn" data-mode="by_yield" style="flex:1;">
-            Lượng uống thành phẩm
+            By Beverage Yield
           </button>
         </div>
       </div>
 
       <div class="form-group" style="margin-top: 24px;">
-        <label id="amount-label" class="form-label" for="amount-input">Khối lượng cà phê hạt / bột:</label>
+        <label id="amount-label" class="form-label" for="amount-input">Ground Coffee Dose:</label>
         <div class="num-input-wrap">
           <input
             type="number"
@@ -99,7 +114,7 @@ const jsonLd = [
             min="1"
             max="2000"
             step="0.5"
-            aria-label="Khối lượng đầu vào"
+            aria-label="Input Amount"
           />
           <span id="amount-unit" class="unit-tag">g</span>
         </div>
@@ -111,21 +126,21 @@ const jsonLd = [
           min="8"
           max="60"
           step="1"
-          aria-label="Thanh trượt điều chỉnh"
+          aria-label="Amount slider"
         />
       </div>
 
       <div class="form-group" style="margin-top: 24px;">
-        <label class="form-label">Gu độ đậm (Strength):</label>
+        <label class="form-label">Strength & Profile:</label>
         <div style="display: flex; gap: 8px;">
           <button type="button" class="pill-btn" data-strength="light" style="flex:1; justify-content:center;">
-            🍃 Thanh / Nhạt
+            🍃 Light / Delicate
           </button>
           <button type="button" class="pill-btn active" data-strength="balanced" style="flex:1; justify-content:center;">
-            ⚖️ Cân bằng
+            ⚖️ Balanced (SCA)
           </button>
           <button type="button" class="pill-btn" data-strength="strong" style="flex:1; justify-content:center;">
-            🔥 Đậm đà
+            🔥 Rich / Bold
           </button>
         </div>
       </div>
@@ -142,49 +157,49 @@ const jsonLd = [
             <line x1="16" y1="17" x2="8" y2="17"/>
             <polyline points="10 9 9 9 8 9"/>
           </svg>
-          2. Công Thức Chiết Xuất Chuẩn
+          2. Target Brew Recipe
         </h2>
 
         <!-- Main Display Well -->
         <div class="output-hero">
-          <div class="output-hero-label">Tổng Nước Rót Cần Thiết</div>
+          <div class="output-hero-label">Total Water to Pour</div>
           <div id="out-water" class="output-hero-val">240g</div>
           <div class="output-hero-sub">
-            Tỷ lệ chiết xuất: <strong id="out-ratio" style="color:#FFC872;">1:16</strong> (~62.5 g/L)
+            Brew Ratio: <strong id="out-ratio" style="color:#FFC872;">1:16</strong> (~62.5 g/L)
           </div>
         </div>
 
         <div class="stat-grid">
           <div class="stat-box">
-            <div class="stat-label">Bột Cà Phê Khô</div>
+            <div class="stat-label">Ground Coffee Dose</div>
             <div id="out-coffee" class="stat-val">15g</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Cà Phê Thu Được (Yield)</div>
-            <div id="out-yield" class="stat-val">~208.5ml</div>
+            <div class="stat-label">Estimated Beverage Yield</div>
+            <div id="out-yield" class="stat-val">~208.5 ml</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Nước Ủ (Bloom)</div>
-            <div id="out-bloom" class="stat-val">45g (ủ 45s)</div>
+            <div class="stat-label">Bloom Water</div>
+            <div id="out-bloom" class="stat-val">45g (45s bloom)</div>
           </div>
           <div class="stat-box">
-            <div class="stat-label">Thời Gian Mục Tiêu</div>
+            <div class="stat-label">Target Brew Time</div>
             <div id="out-brew-time" class="stat-val">3:30</div>
           </div>
         </div>
 
         <div style="background-color:var(--color-surface-subtle); border-radius:var(--radius-md); padding:14px; border:1px solid var(--color-border); font-size:0.9rem;">
           <div style="margin-bottom:6px;">
-            <strong style="color:var(--color-espresso);">🔍 Độ mịn bột khuyến nghị:</strong> <span id="out-grind">Medium-Fine</span>
+            <strong style="color:var(--color-espresso);">🔍 Recommended Grind:</strong> <span id="out-grind">Medium-Fine</span>
           </div>
           <div>
-            <strong style="color:var(--color-espresso);">🌡️ Nhiệt độ nước pha:</strong> <span id="out-temp">92°C - 96°C</span>
+            <strong style="color:var(--color-espresso);">🌡️ Target Water Temp:</strong> <span id="out-temp">198°F - 205°F (92°C - 96°C)</span>
           </div>
         </div>
       </div>
 
       <div style="margin-top:20px; font-size:0.8rem; color:var(--color-text-subtle); text-align:center;">
-        * Đã tính độ ngậm nước tự nhiên của bã cà phê (2.1g nước / 1g bột khô).
+        * Accounts for 2.1g of water absorbed per gram of spent coffee grounds.
       </div>
     </div>
   </section>
@@ -198,19 +213,19 @@ const jsonLd = [
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
           </svg>
-          3. Đồng Hồ Rót Phân Đoạn (Pulse Pour Timer)
+          3. Real-Time Pulse Pour Timer
         </h2>
 
         <!-- Pulse Strategy Selector -->
-        <div style="display:flex; gap:6px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button type="button" class="pill-btn active" data-pulse="three_stage" style="padding:6px 12px; font-size:0.85rem;">
-            Rót 3 Lần (Chuẩn)
+            SCA 3-Stage Pour
           </button>
           <button type="button" class="pill-btn" data-pulse="four_six" style="padding:6px 12px; font-size:0.85rem;">
-            Phương Pháp 4:6 (Kasuya)
+            Tetsu Kasuya 4:6
           </button>
           <button type="button" class="pill-btn" data-pulse="single_pour" style="padding:6px 12px; font-size:0.85rem;">
-            Rót 1 Lần
+            Continuous Single Pour
           </button>
         </div>
       </div>
@@ -218,61 +233,27 @@ const jsonLd = [
       <!-- Clock & Status Well -->
       <div class="timer-display">
         <div id="timer-digits" class="timer-digits">00:00</div>
-        <div id="timer-step-name" class="timer-step-status">
-          Sẵn sàng: 1. Ủ cà phê (Bloom)
-        </div>
+        <div id="timer-step-name" class="timer-status">Ready to brew</div>
         <div class="timer-bar-wrap">
-          <div id="timer-bar-fill" class="timer-bar-fill"></div>
+          <div id="timer-bar-fill" class="timer-bar"></div>
+        </div>
+        <div class="timer-actions">
+          <button type="button" id="btn-timer-start" class="btn-timer btn-timer-start">
+            ▶ Start Timer
+          </button>
+          <button type="button" id="btn-timer-reset" class="btn-timer btn-timer-reset">
+            ↺ Reset
+          </button>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="btn-group">
-        <button type="button" id="btn-timer-start" class="btn-primary">
-          Bắt đầu rót ▶
-        </button>
-        <button type="button" id="btn-timer-reset" class="btn-secondary">
-          Đặt lại ↺
-        </button>
-      </div>
-
-      <!-- Live Step Schedule -->
-      <div id="pulse-steps-list" class="pulse-steps-list">
-        <!-- Rendered dynamically by calculator.ts -->
-      </div>
-    </div>
-  </section>
-
-  <!-- Educational Section: Coffee Brewing Science -->
-  <section class="wrap" style="margin-bottom: 60px;">
-    <div style="border-top:1px solid var(--color-border); padding-top:40px;">
-      <h2 style="font-size:1.6rem; font-weight:800; color:var(--color-espresso); margin-bottom:16px;">
-        Khoa Học Pha Cà Phê Thủ Công Chuẩn Quốc Tế
-      </h2>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px;">
-        <div class="card" style="padding:20px;">
-          <h3 style="font-size:1.1rem; font-weight:800; color:var(--color-crema); margin-bottom:8px;">
-            ⚖️ Chuẩn SCA Golden Cup
-          </h3>
-          <p style="font-size:0.9rem; color:var(--color-text-muted); line-height:1.6;">
-            Hiệp hội Cà phê Đặc sản (SCA) khuyến nghị tỷ lệ 55g/L – 60g/L (tương đương 1:16 đến 1:18) để đạt hiệu suất chiết xuất lý tưởng 18% - 22% (TDS 1.15% - 1.45%), mang lại tách cà phê ngọt hậu và không chát đắng.
-          </p>
-        </div>
-        <div class="card" style="padding:20px;">
-          <h3 style="font-size:1.1rem; font-weight:800; color:var(--color-crema); margin-bottom:8px;">
-            🌸 Giai đoạn Ủ (Blooming)
-          </h3>
-          <p style="font-size:0.9rem; color:var(--color-text-muted); line-height:1.6;">
-            Bột cà phê mới rang chứa lượng khí CO2 lớn. Rót 2x – 3x lượng nước trong 30-45 giây đầu giúp bột nở đều, giải phóng CO2 và mở đường cho nước chiết xuất trọn vẹn các hợp chất hương thơm phức tạp.
-          </p>
-        </div>
-        <div class="card" style="padding:20px;">
-          <h3 style="font-size:1.1rem; font-weight:800; color:var(--color-crema); margin-bottom:8px;">
-            💧 Phương pháp Rót 4:6 của Tetsu Kasuya
-          </h3>
-          <p style="font-size:0.9rem; color:var(--color-text-muted); line-height:1.6;">
-            Chia 40% lượng nước đầu tiên làm 2 lần rót để cân bằng vị chua (acidity) và ngọt (sweetness). 60% lượng nước còn lại chia làm 3 lần rót để điều chỉnh độ đậm đà (strength & body) của tách cà phê.
-          </p>
+      <!-- Pulse Pour Schedule List -->
+      <div style="margin-top: 28px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          Pouring Schedule & Intervals
+        </h3>
+        <div id="pulse-steps-list" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Dynamically populated by calculator.ts -->
         </div>
       </div>
     </div>
@@ -280,5 +261,5 @@ const jsonLd = [
 </BaseLayout>
 
 <script>
-  import '../scripts/calculator';
+  import '../scripts/calculator.ts';
 </script>

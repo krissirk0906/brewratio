@@ -5,6 +5,7 @@ export interface ClientBrewState {
   strength: 'light' | 'balanced' | 'strong';
   customRatio?: number;
   pulseMethod: 'single_pour' | 'three_stage' | 'four_six';
+  unit: 'metric' | 'imperial';
 }
 
 import { calculateBrew } from '../lib/calc/brewRatio';
@@ -19,6 +20,7 @@ let state: ClientBrewState = {
   amount: 15,
   strength: 'balanced',
   pulseMethod: 'three_stage',
+  unit: 'metric',
 };
 
 let currentSchedule: PulseScheduleResult | null = null;
@@ -27,12 +29,12 @@ let timerRunning = false;
 let currentElapsedSec = 0;
 let currentStepIndex = 0;
 
-// DOM Elements
 function initCalculator(): void {
   const methodPills = document.querySelectorAll<HTMLButtonElement>('[data-method]');
   const modeTabs = document.querySelectorAll<HTMLButtonElement>('[data-mode]');
   const strengthPills = document.querySelectorAll<HTMLButtonElement>('[data-strength]');
   const pulseMethodPills = document.querySelectorAll<HTMLButtonElement>('[data-pulse]');
+  const unitToggles = document.querySelectorAll<HTMLButtonElement>('[data-unit]');
   
   const amountInput = document.getElementById('amount-input') as HTMLInputElement | null;
   const amountSlider = document.getElementById('amount-slider') as HTMLInputElement | null;
@@ -66,13 +68,36 @@ function initCalculator(): void {
       customRatio: state.customRatio,
     });
 
-    if (outCoffee) outCoffee.textContent = `${res.coffeeGrams}g`;
-    if (outWater) outWater.textContent = `${res.waterGrams}g`;
-    if (outYield) outYield.textContent = `~${res.estimatedYieldMl}ml`;
+    const isImperial = state.unit === 'imperial';
+
+    if (outCoffee) {
+      outCoffee.textContent = isImperial
+        ? `${res.coffeeOz} oz (${res.coffeeGrams}g)`
+        : `${res.coffeeGrams}g`;
+    }
+
+    if (outWater) {
+      outWater.textContent = isImperial
+        ? `${res.waterOz} fl oz (${res.waterGrams}g)`
+        : `${res.waterGrams}g`;
+    }
+
+    if (outYield) {
+      outYield.textContent = isImperial
+        ? `~${res.estimatedYieldOz} fl oz`
+        : `~${res.estimatedYieldMl} ml`;
+    }
+
     if (outRatio) outRatio.textContent = res.ratioText;
-    if (outBloom) outBloom.textContent = `${res.bloomWaterGrams}g (ủ ${res.bloomTimeSec}s)`;
+
+    if (outBloom) {
+      outBloom.textContent = isImperial
+        ? `${(res.bloomWaterGrams * 0.035274).toFixed(1)} oz (${res.bloomWaterGrams}g) · ${res.bloomTimeSec}s`
+        : `${res.bloomWaterGrams}g (${res.bloomTimeSec}s bloom)`;
+    }
+
     if (outGrind) outGrind.textContent = res.recommendedGrind;
-    if (outTemp) outTemp.textContent = res.waterTempC;
+    if (outTemp) outTemp.textContent = res.waterTemp;
     if (outBrewTime) outBrewTime.textContent = res.targetBrewTimeText;
 
     // Generate pulse schedule
@@ -90,6 +115,8 @@ function initCalculator(): void {
     if (!pulseStepsContainer || !currentSchedule) return;
     pulseStepsContainer.innerHTML = '';
 
+    const isImperial = state.unit === 'imperial';
+
     currentSchedule.steps.forEach((step, idx) => {
       const row = document.createElement('div');
       row.className = `pulse-step-row ${idx === currentStepIndex && timerRunning ? 'active' : ''}`;
@@ -99,8 +126,16 @@ function initCalculator(): void {
       const secs = step.startSec % 60;
       const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
 
+      const pourText = isImperial
+        ? `+${step.waterAmountOz} oz`
+        : `+${step.waterAmountGrams}g`;
+
+      const totalText = isImperial
+        ? `Total: ${step.cumulativeWaterOz} oz`
+        : `Total: ${step.cumulativeWaterGrams}g`;
+
       row.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:2px;">
+        <div style="display:flex; flex-direction:column; gap:3px;">
           <div style="font-weight:700; font-size:0.95rem; color:var(--color-espresso);">
             ${step.stepIndex}. ${step.name}
           </div>
@@ -110,10 +145,10 @@ function initCalculator(): void {
         </div>
         <div style="text-align:right;">
           <div style="font-weight:800; font-family:var(--font-mono); color:var(--color-crema); font-size:1.05rem;">
-            +${step.waterAmountGrams}g <span style="font-size:0.8rem; color:var(--color-text-muted); font-weight:normal;">(Tổng ${step.cumulativeWaterGrams}g)</span>
+            ${pourText} <span style="font-size:0.8rem; color:var(--color-text-muted); font-weight:normal;">(${totalText})</span>
           </div>
           <div style="font-size:0.8rem; font-weight:700; color:var(--color-text-subtle);">
-            Mốc ${timeStr}
+            Target @ ${timeStr}
           </div>
         </div>
       `;
@@ -123,37 +158,37 @@ function initCalculator(): void {
 
   function updateInputControls(): void {
     if (state.mode === 'by_coffee') {
-      if (amountLabel) amountLabel.textContent = 'Khối lượng cà phê hạt / bột:';
-      if (amountUnit) amountUnit.textContent = 'g';
+      if (amountLabel) amountLabel.textContent = 'Ground Coffee Dose:';
+      if (amountUnit) amountUnit.textContent = state.unit === 'imperial' ? 'oz' : 'g';
       if (amountSlider) {
-        amountSlider.min = '8';
-        amountSlider.max = '60';
-        amountSlider.step = '1';
+        amountSlider.min = state.unit === 'imperial' ? '0.3' : '8';
+        amountSlider.max = state.unit === 'imperial' ? '2.5' : '60';
+        amountSlider.step = state.unit === 'imperial' ? '0.1' : '1';
         amountSlider.value = String(state.amount);
       }
     } else if (state.mode === 'by_water') {
-      if (amountLabel) amountLabel.textContent = 'Tổng lượng nước muốn pha:';
-      if (amountUnit) amountUnit.textContent = 'ml/g';
+      if (amountLabel) amountLabel.textContent = 'Total Water to Pour:';
+      if (amountUnit) amountUnit.textContent = state.unit === 'imperial' ? 'fl oz' : 'g';
       if (amountSlider) {
-        amountSlider.min = '100';
-        amountSlider.max = '1000';
-        amountSlider.step = '10';
+        amountSlider.min = state.unit === 'imperial' ? '4' : '100';
+        amountSlider.max = state.unit === 'imperial' ? '36' : '1000';
+        amountSlider.step = state.unit === 'imperial' ? '1' : '10';
         amountSlider.value = String(state.amount);
       }
     } else {
-      if (amountLabel) amountLabel.textContent = 'Lượng cà phê thành phẩm thu được:';
-      if (amountUnit) amountUnit.textContent = 'ml';
+      if (amountLabel) amountLabel.textContent = 'Target Beverage Yield:';
+      if (amountUnit) amountUnit.textContent = state.unit === 'imperial' ? 'fl oz' : 'ml';
       if (amountSlider) {
-        amountSlider.min = '80';
-        amountSlider.max = '800';
-        amountSlider.step = '10';
+        amountSlider.min = state.unit === 'imperial' ? '4' : '80';
+        amountSlider.max = state.unit === 'imperial' ? '32' : '800';
+        amountSlider.step = state.unit === 'imperial' ? '1' : '10';
         amountSlider.value = String(state.amount);
       }
     }
     if (amountInput) amountInput.value = String(state.amount);
   }
 
-  // Event Listeners for Method Pills
+  // Method Selection
   methodPills.forEach((btn) => {
     btn.addEventListener('click', () => {
       methodPills.forEach((b) => b.classList.remove('active'));
@@ -163,7 +198,7 @@ function initCalculator(): void {
     });
   });
 
-  // Event Listeners for Mode Tabs
+  // Mode Selection
   modeTabs.forEach((btn) => {
     btn.addEventListener('click', () => {
       modeTabs.forEach((b) => b.classList.remove('active'));
@@ -177,7 +212,7 @@ function initCalculator(): void {
     });
   });
 
-  // Strength Pills
+  // Strength Selection
   strengthPills.forEach((btn) => {
     btn.addEventListener('click', () => {
       strengthPills.forEach((b) => b.classList.remove('active'));
@@ -187,7 +222,7 @@ function initCalculator(): void {
     });
   });
 
-  // Pulse Method Pills
+  // Pulse Strategy Selection
   pulseMethodPills.forEach((btn) => {
     btn.addEventListener('click', () => {
       pulseMethodPills.forEach((b) => b.classList.remove('active'));
@@ -198,103 +233,133 @@ function initCalculator(): void {
     });
   });
 
-  // Input bindings
-  if (amountInput) {
+  // Unit Selector (Metric vs Imperial)
+  unitToggles.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      unitToggles.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.unit = (btn.dataset.unit as any) || 'metric';
+      updateInputControls();
+      renderOutputs();
+    });
+  });
+
+  // Sync Slider and Number Input
+  if (amountInput && amountSlider) {
     amountInput.addEventListener('input', () => {
       const val = parseFloat(amountInput.value);
-      if (!Number.isNaN(val) && val > 0) {
+      if (!Number.isNaN(val)) {
         state.amount = val;
-        if (amountSlider) amountSlider.value = String(val);
+        amountSlider.value = String(val);
         renderOutputs();
       }
     });
-  }
 
-  if (amountSlider) {
     amountSlider.addEventListener('input', () => {
       const val = parseFloat(amountSlider.value);
       state.amount = val;
-      if (amountInput) amountInput.value = String(val);
+      amountInput.value = String(val);
       renderOutputs();
     });
   }
 
-  // ==========================================================================
-  // Timer Logic & Web Audio API
-  // ==========================================================================
-  function formatSeconds(sec: number): string {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  // Timer Logic
+  function updateTimerUI(): void {
+    if (!timerDigits || !timerStepName || !currentSchedule) return;
+
+    const mins = Math.floor(currentElapsedSec / 60);
+    const secs = currentElapsedSec % 60;
+    timerDigits.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+    // Find current active step
+    let activeIdx = 0;
+    for (let i = 0; i < currentSchedule.steps.length; i++) {
+      if (currentElapsedSec >= currentSchedule.steps[i].startSec) {
+        activeIdx = i;
+      }
+    }
+
+    if (activeIdx !== currentStepIndex && timerRunning) {
+      currentStepIndex = activeIdx;
+      playChime(880, 0.25); // Chime on new step
+    }
+
+    const currentStep = currentSchedule.steps[currentStepIndex];
+    if (currentStep) {
+      timerStepName.textContent = `Step ${currentStep.stepIndex}/${currentSchedule.steps.length}: ${currentStep.name}`;
+    }
+
+    // Progress bar
+    if (timerBar && currentSchedule.totalTimeSec > 0) {
+      const progress = Math.min(100, (currentElapsedSec / currentSchedule.totalTimeSec) * 100);
+      timerBar.style.width = `${progress}%`;
+    }
+
+    // Highlight row
+    document.querySelectorAll('.pulse-step-row').forEach((el, idx) => {
+      if (idx === currentStepIndex && timerRunning) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+
+    // Finished?
+    if (currentElapsedSec >= currentSchedule.totalTimeSec) {
+      pauseTimer();
+      timerStepName.textContent = '🎉 Brew Complete! Enjoy your cup.';
+      playCompletionChime();
+    }
   }
 
   function startTimer(): void {
     if (timerRunning) return;
     timerRunning = true;
-    if (btnStart) btnStart.textContent = 'Tạm dừng ⏸';
-    playChime(880, 0.8); // Initial start chime
+    if (btnStart) {
+      btnStart.textContent = '⏸ Pause';
+      btnStart.classList.add('active');
+    }
+
+    // Resume Audio Context on user gesture
+    playChime(660, 0.1);
 
     timerInterval = window.setInterval(() => {
-      currentElapsedSec++;
-      if (timerDigits) timerDigits.textContent = formatSeconds(currentElapsedSec);
-
-      // Check current step
-      if (currentSchedule && currentSchedule.steps.length > 0) {
-        const total = currentSchedule.totalTimeSec;
-        const progress = Math.min(100, (currentElapsedSec / total) * 100);
-        if (timerBar) timerBar.style.width = `${progress}%`;
-
-        // Check if step changed
-        const activeIdx = currentSchedule.steps.findIndex((step, i) => {
-          const nextStep = currentSchedule!.steps[i + 1];
-          return currentElapsedSec >= step.startSec && (!nextStep || currentElapsedSec < nextStep.startSec);
-        });
-
-        if (activeIdx !== -1 && activeIdx !== currentStepIndex) {
-          currentStepIndex = activeIdx;
-          playChime(1046, 1.0); // Step change chime
-          renderPulseSteps();
-        }
-
-        if (currentSchedule.steps[currentStepIndex] && timerStepName) {
-          timerStepName.textContent = currentSchedule.steps[currentStepIndex].name;
-        }
-
-        // Completion check
-        if (currentElapsedSec >= total) {
-          pauseTimer();
-          playCompletionChime();
-          if (timerStepName) timerStepName.textContent = '🎉 Chiết xuất hoàn tất!';
-        }
-      }
+      currentElapsedSec += 1;
+      updateTimerUI();
     }, 1000);
+    updateTimerUI();
   }
 
   function pauseTimer(): void {
-    if (!timerRunning) return;
     timerRunning = false;
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = null;
-    if (btnStart) btnStart.textContent = 'Tiếp tục ▶';
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    if (btnStart) {
+      btnStart.textContent = '▶ Resume';
+      btnStart.classList.remove('active');
+    }
   }
 
   function resetTimer(): void {
     pauseTimer();
     currentElapsedSec = 0;
     currentStepIndex = 0;
+    if (btnStart) btnStart.textContent = '▶ Start Timer';
     if (timerDigits) timerDigits.textContent = '00:00';
+    if (timerStepName) timerStepName.textContent = 'Ready to brew';
     if (timerBar) timerBar.style.width = '0%';
-    if (btnStart) btnStart.textContent = 'Bắt đầu rót ▶';
-    if (timerStepName && currentSchedule && currentSchedule.steps[0]) {
-      timerStepName.textContent = `Sẵn sàng: ${currentSchedule.steps[0].name}`;
-    }
-    renderPulseSteps();
+    document.querySelectorAll('.pulse-step-row').forEach((el) => el.classList.remove('active'));
   }
 
   if (btnStart) {
     btnStart.addEventListener('click', () => {
-      if (timerRunning) pauseTimer();
-      else startTimer();
+      if (timerRunning) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
     });
   }
 
@@ -305,7 +370,6 @@ function initCalculator(): void {
   // Initial render
   updateInputControls();
   renderOutputs();
-  resetTimer();
 }
 
 if (document.readyState === 'loading') {

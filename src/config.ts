@@ -10,8 +10,8 @@ export interface SiteConfig {
 
 export const site: SiteConfig = {
   name: 'BrewRatio',
-  tagline: 'Precision Coffee Ratio Calculator & Pour Timer',
-  description: 'Free, privacy-friendly specialty coffee brewing calculator and pulse pour timer for V60, French Press, AeroPress, Chemex, Phin, and Cold Brew.',
+  tagline: 'Specialty Coffee Ratio Calculator & Pulse Pour Timer',
+  description: 'Precision coffee brewing ratio calculator and pulse pour timer for V60, French Press, AeroPress, Chemex, Drip Machine, and Cold Brew. Built to SCA Golden Cup standards with dual metric/imperial units.',
   url: 'https://brewratio.pages.dev',
   adsenseClient: 'ca-pub-2321353976447632',
   author: 'June Nine Studio',

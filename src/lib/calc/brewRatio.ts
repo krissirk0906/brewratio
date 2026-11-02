@@ -18,9 +18,9 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     },
     defaultBloomRatio: 3,
     defaultBloomTimeSec: 45,
-    recommendedGrind: 'Medium-Fine (Muối biển nhỏ)',
+    recommendedGrind: 'Medium-Fine (Table Salt to Sand)',
     defaultBrewTimeSec: 210, // 3:30
-    waterTempC: '92°C - 96°C',
+    waterTemp: '198°F - 205°F (92°C - 96°C)',
   },
   french_press: {
     id: 'french_press',
@@ -34,9 +34,9 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     },
     defaultBloomRatio: 2,
     defaultBloomTimeSec: 30,
-    recommendedGrind: 'Coarse (Muối hạt to)',
+    recommendedGrind: 'Coarse (Kosher Salt)',
     defaultBrewTimeSec: 240, // 4:00
-    waterTempC: '93°C - 96°C',
+    waterTemp: '200°F - 205°F (93°C - 96°C)',
   },
   aeropress: {
     id: 'aeropress',
@@ -52,7 +52,7 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     defaultBloomTimeSec: 30,
     recommendedGrind: 'Medium-Fine',
     defaultBrewTimeSec: 120, // 2:00
-    waterTempC: '85°C - 90°C',
+    waterTemp: '185°F - 195°F (85°C - 90°C)',
   },
   chemex: {
     id: 'chemex',
@@ -66,13 +66,29 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     },
     defaultBloomRatio: 3,
     defaultBloomTimeSec: 45,
-    recommendedGrind: 'Medium-Coarse (Đá xay thô)',
+    recommendedGrind: 'Medium-Coarse (Rough Sand)',
     defaultBrewTimeSec: 240, // 4:00
-    waterTempC: '92°C - 96°C',
+    waterTemp: '198°F - 205°F (92°C - 96°C)',
+  },
+  drip_machine: {
+    id: 'drip_machine',
+    name: 'Auto Drip / Batch Brewer',
+    defaultRatio: 16,
+    ratioRange: [12, 18],
+    strengthRatios: {
+      light: 17,
+      balanced: 16,
+      strong: 15,
+    },
+    defaultBloomRatio: 0,
+    defaultBloomTimeSec: 0,
+    recommendedGrind: 'Medium (Sand)',
+    defaultBrewTimeSec: 300, // 5:00
+    waterTemp: '195°F - 205°F (91°C - 96°C)',
   },
   cold_brew: {
     id: 'cold_brew',
-    name: 'Cold Brew (Ủ lạnh)',
+    name: 'Cold Brew (Immersion)',
     defaultRatio: 8,
     ratioRange: [4, 15],
     strengthRatios: {
@@ -82,13 +98,13 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     },
     defaultBloomRatio: 0,
     defaultBloomTimeSec: 0,
-    recommendedGrind: 'Extra Coarse (Siêu thô)',
+    recommendedGrind: 'Extra Coarse (Cracked Peppercorn)',
     defaultBrewTimeSec: 43200, // 12 hours
-    waterTempC: 'Nước lọc nguội / Nước lạnh (4°C - 20°C)',
+    waterTemp: 'Chilled / Filtered Room Temp (40°F - 68°F / 4°C - 20°C)',
   },
   vietnamese_phin: {
     id: 'vietnamese_phin',
-    name: 'Phin Truyền Thống Việt Nam',
+    name: 'Vietnamese Phin Drip',
     defaultRatio: 4.5,
     ratioRange: [3, 7],
     strengthRatios: {
@@ -96,11 +112,11 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
       balanced: 4.5,
       strong: 3.5,
     },
-    defaultBloomRatio: 1.5, // Châm đáy và ủ mặt 20-30ml
+    defaultBloomRatio: 1.5,
     defaultBloomTimeSec: 60,
-    recommendedGrind: 'Medium (Cát mịn)',
+    recommendedGrind: 'Medium (Fine Sand)',
     defaultBrewTimeSec: 300, // 5:00
-    waterTempC: '94°C - 98°C',
+    waterTemp: '200°F - 208°F (94°C - 98°C)',
   },
   espresso: {
     id: 'espresso',
@@ -114,13 +130,13 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     },
     defaultBloomRatio: 0,
     defaultBloomTimeSec: 0,
-    recommendedGrind: 'Fine (Mịn bột)',
+    recommendedGrind: 'Fine (Powder/Flour)',
     defaultBrewTimeSec: 28,
-    waterTempC: '90°C - 93°C',
+    waterTemp: '195°F - 200°F (90°C - 93°C)',
   },
   custom: {
     id: 'custom',
-    name: 'Tùy chỉnh cá nhân',
+    name: 'Custom Method',
     defaultRatio: 15,
     ratioRange: [2, 30],
     strengthRatios: {
@@ -130,13 +146,15 @@ export const METHOD_CONFIGS: Record<BrewMethodId, MethodConfig> = {
     },
     defaultBloomRatio: 2.5,
     defaultBloomTimeSec: 30,
-    recommendedGrind: 'Tùy chọn',
+    recommendedGrind: 'User Preference',
     defaultBrewTimeSec: 180,
-    waterTempC: '90°C - 96°C',
+    waterTemp: '195°F - 205°F (90°C - 96°C)',
   },
 };
 
-export const WATER_ABSORPTION_FACTOR = 2.1; // 2.1g of water absorbed per 1g dry coffee
+export const WATER_ABSORPTION_FACTOR = 2.1; // 2.1g of water retained per 1g dry coffee grounds
+const GRAMS_TO_OZ = 0.035274;
+const ML_TO_FL_OZ = 0.033814;
 
 export function getMethodConfig(method: BrewMethodId): MethodConfig {
   return METHOD_CONFIGS[method] || METHOD_CONFIGS.custom;
@@ -145,7 +163,7 @@ export function getMethodConfig(method: BrewMethodId): MethodConfig {
 function formatTime(totalSec: number): string {
   if (totalSec >= 3600) {
     const hours = Math.floor(totalSec / 3600);
-    return `${hours} giờ`;
+    return `${hours} hrs`;
   }
   const mins = Math.floor(totalSec / 60);
   const secs = totalSec % 60;
@@ -177,40 +195,58 @@ export function calculateBrew(input: BrewCalcInput): BrewCalcResult {
       waterGrams = coffeeGrams * effectiveRatio;
     } else if (input.mode === 'by_water') {
       waterGrams = rawAmount;
-      coffeeGrams = waterGrams / effectiveRatio;
+      coffeeGrams = effectiveRatio > 0 ? waterGrams / effectiveRatio : 0;
     } else if (input.mode === 'by_yield') {
-      // Yield = Water - (Coffee * Absorption) = (Coffee * Ratio) - (Coffee * Absorption) = Coffee * (Ratio - Absorption)
-      const netMultiplier = effectiveRatio - WATER_ABSORPTION_FACTOR;
-      if (netMultiplier > 0) {
-        coffeeGrams = rawAmount / netMultiplier;
+      const targetYield = rawAmount;
+      // Equation: Yield = Water - (Coffee * 2.1)
+      // Since Water = Coffee * effectiveRatio:
+      // Yield = Coffee * (effectiveRatio - 2.1)
+      const denominator = effectiveRatio - WATER_ABSORPTION_FACTOR;
+      if (denominator > 0) {
+        coffeeGrams = targetYield / denominator;
         waterGrams = coffeeGrams * effectiveRatio;
       } else {
-        coffeeGrams = rawAmount;
-        waterGrams = rawAmount * effectiveRatio;
+        coffeeGrams = targetYield / effectiveRatio;
+        waterGrams = targetYield;
       }
     }
   }
 
-  const roundedCoffee = Math.round(coffeeGrams * 10) / 10;
-  const roundedWater = Math.round(waterGrams * 10) / 10;
-  const waterRetention = Math.round(roundedCoffee * WATER_ABSORPTION_FACTOR * 10) / 10;
-  const estimatedYield = Math.max(0, Math.round((roundedWater - waterRetention) * 10) / 10);
-  const bloomWater = Math.round(roundedCoffee * config.defaultBloomRatio * 10) / 10;
+  // Round values
+  coffeeGrams = Math.round(coffeeGrams * 10) / 10;
+  waterGrams = Math.round(waterGrams * 10) / 10;
+
+  const waterRetentionGrams = Math.round(coffeeGrams * WATER_ABSORPTION_FACTOR * 10) / 10;
+  const estimatedYieldMl = Math.max(0, Math.round((waterGrams - waterRetentionGrams) * 10) / 10);
+
+  // Imperial unit conversions
+  const coffeeOz = Math.round(coffeeGrams * GRAMS_TO_OZ * 100) / 100;
+  const waterOz = Math.round(waterGrams * ML_TO_FL_OZ * 10) / 10;
+  const estimatedYieldOz = Math.round(estimatedYieldMl * ML_TO_FL_OZ * 10) / 10;
+
+  // Bloom calculation
+  let bloomWaterGrams = Math.round(coffeeGrams * config.defaultBloomRatio * 10) / 10;
+  if (bloomWaterGrams > waterGrams) {
+    bloomWaterGrams = waterGrams;
+  }
 
   return {
     methodId: config.id,
     methodName: config.name,
-    coffeeGrams: roundedCoffee,
-    waterGrams: roundedWater,
-    ratio: effectiveRatio,
-    ratioText: `1:${effectiveRatio}`,
-    estimatedYieldMl: estimatedYield,
-    bloomWaterGrams: bloomWater,
+    coffeeGrams,
+    coffeeOz,
+    waterGrams,
+    waterOz,
+    ratio: Math.round(effectiveRatio * 10) / 10,
+    ratioText: `1:${Math.round(effectiveRatio * 10) / 10}`,
+    estimatedYieldMl,
+    estimatedYieldOz,
+    bloomWaterGrams,
     bloomTimeSec: config.defaultBloomTimeSec,
     recommendedGrind: config.recommendedGrind,
     targetBrewTimeSec: config.defaultBrewTimeSec,
     targetBrewTimeText: formatTime(config.defaultBrewTimeSec),
-    waterTempC: config.waterTempC,
-    waterRetentionGrams: waterRetention,
+    waterTemp: config.waterTemp,
+    waterRetentionGrams,
   };
 }

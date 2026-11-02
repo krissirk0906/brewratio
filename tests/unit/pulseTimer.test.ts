@@ -14,7 +14,7 @@ describe('PulseTimer Schedule Generation (TDD)', () => {
     expect(schedule.steps).toHaveLength(3);
 
     // Step 1: Bloom (60g water = 20% or 3x coffee)
-    expect(schedule.steps[0].name).toContain('Ủ cà phê');
+    expect(schedule.steps[0].name).toContain('Bloom');
     expect(schedule.steps[0].waterAmountGrams).toBe(60);
     expect(schedule.steps[0].cumulativeWaterGrams).toBe(60);
     expect(schedule.steps[0].startSec).toBe(0);
@@ -68,14 +68,10 @@ describe('PulseTimer Schedule Generation (TDD)', () => {
     });
 
     expect(schedule.pulseMethodId).toBe('single_pour');
-    expect(schedule.steps).toHaveLength(2); // Bloom + Main Pour
+    expect(schedule.steps).toHaveLength(1);
 
-    expect(schedule.steps[0].name).toContain('Ủ cà phê');
-    expect(schedule.steps[0].waterAmountGrams).toBe(45); // 3x 15g
-    expect(schedule.steps[0].cumulativeWaterGrams).toBe(45);
-
-    expect(schedule.steps[1].name).toContain('Rót chính');
-    expect(schedule.steps[1].waterAmountGrams).toBe(205); // 250 - 45
-    expect(schedule.steps[1].cumulativeWaterGrams).toBe(250);
+    expect(schedule.steps[0].name).toContain('Continuous Pour');
+    expect(schedule.steps[0].waterAmountGrams).toBe(250);
+    expect(schedule.steps[0].cumulativeWaterGrams).toBe(250);
   });
 });

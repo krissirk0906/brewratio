@@ -3,7 +3,6 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// Simple static server for dist directory
 function startStaticServer(distDir, port) {
   const mimeTypes = {
     '.html': 'text/html',
@@ -11,6 +10,7 @@ function startStaticServer(distDir, port) {
     '.css': 'text/css',
     '.json': 'application/json',
     '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
     '.txt': 'text/plain',
   };
 
@@ -52,7 +52,7 @@ async function runBrewRatioQCAudit() {
   const port = 4173;
   const baseUrl = `http://localhost:${port}`;
   const server = await startStaticServer(distDir, port);
-  console.log(`=== START SENIOR QC AUDIT: ${baseUrl} ===\n`);
+  console.log(`=== START SENIOR QC AUDIT (US/UK Market): ${baseUrl} ===\n`);
 
   const browser = await chromium.launch({ channel: 'chrome' });
   const context = await browser.newContext();
@@ -72,15 +72,22 @@ async function runBrewRatioQCAudit() {
   });
 
   try {
-    // Suite 1: Homepage & Initial Calculations
-    console.log('--- Suite 1: Homepage & SEO/Branding ---');
+    // Suite 1: US/UK SEO, Meta Tags & Branding
+    console.log('--- Suite 1: US/UK SEO, Meta Tags & Branding ---');
     await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
 
     const title = await page.title();
-    if (title.includes('BrewRatio')) {
-      passed.push(`Title contains "BrewRatio" ("${title}")`);
+    if (title.includes('BrewRatio') && title.includes('Calculator')) {
+      passed.push(`Title optimized for US/UK coffee searches ("${title}")`);
     } else {
-      issues.push(`Title invalid: "${title}"`);
+      issues.push(`Title unexpected: "${title}"`);
+    }
+
+    const lang = await page.locator('html').getAttribute('lang');
+    if (lang === 'en') {
+      passed.push('HTML root correctly targeted to English (lang="en")');
+    } else {
+      issues.push(`Expected lang="en", got "${lang}"`);
     }
 
     // Verify package ID is NOT exposed on public UI/DOM
@@ -103,18 +110,30 @@ async function runBrewRatioQCAudit() {
     // Return to homepage
     await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
 
-    // Suite 2: Interactive Calculator & State Changes
-    console.log('\n--- Suite 2: Calculator Interactivity ---');
+    // Suite 2: Calculator Interactivity & Units Switch (Metric <-> US Customary)
+    console.log('\n--- Suite 2: Calculator Interactivity & Dual Units ---');
     // Default V60, 15g -> 240g water
     const outWater = await page.locator('#out-water').textContent();
     const outCoffee = await page.locator('#out-coffee').textContent();
-    const outYield = await page.locator('#out-yield').textContent();
 
     if (outWater.trim() === '240g' && outCoffee.trim() === '15g') {
       passed.push('Default 15g V60 calculation matches 240g water');
     } else {
       issues.push(`Expected 240g water / 15g coffee, got ${outWater} / ${outCoffee}`);
     }
+
+    // Switch to US Customary (imperial oz)
+    await page.locator('button[data-unit="imperial"]').click();
+    const outWaterOz = await page.locator('#out-water').textContent();
+    const outCoffeeOz = await page.locator('#out-coffee').textContent();
+    if (outWaterOz.includes('fl oz') && outCoffeeOz.includes('oz')) {
+      passed.push(`US Customary unit toggle works cleanly: ${outWaterOz} / ${outCoffeeOz}`);
+    } else {
+      issues.push(`US Customary toggle failed: ${outWaterOz} / ${outCoffeeOz}`);
+    }
+
+    // Switch back to metric for method checks
+    await page.locator('button[data-unit="metric"]').click();
 
     // Switch method to French Press (default 1:15)
     await page.locator('button[data-method="french_press"]').click();
@@ -125,29 +144,38 @@ async function runBrewRatioQCAudit() {
       issues.push(`French Press expected 225g water, got ${frenchWater}`);
     }
 
-    // Switch mode to "by_water" (e.g. 300ml)
+    // Switch method to Auto Drip (US/UK staple)
+    await page.locator('button[data-method="drip_machine"]').click();
+    const dripWater = await page.locator('#out-water').textContent();
+    if (dripWater.trim() === '240g') {
+      passed.push('Auto Drip / Batch Brewer mode supported with 1:16 ratio');
+    } else {
+      issues.push(`Drip Machine expected 240g water, got ${dripWater}`);
+    }
+
+    // Switch mode to "by_water" (e.g. 300g)
     await page.locator('button[data-mode="by_water"]').click();
     await page.locator('#amount-input').fill('300');
     await page.locator('#amount-input').dispatchEvent('input');
     const coffeeFor300 = await page.locator('#out-coffee').textContent();
-    if (coffeeFor300.trim() === '20g') {
-      passed.push('Mode "by_water" (300g @ 1:15) correctly calculates 20g coffee');
+    if (coffeeFor300.trim().startsWith('18.8g') || coffeeFor300.trim().startsWith('19g')) {
+      passed.push('Mode "by_water" (300g @ 1:16) correctly calculates ~18.8g coffee');
     } else {
-      issues.push(`Expected 20g coffee for 300g water on 1:15, got ${coffeeFor300}`);
+      issues.push(`Expected ~18.8g coffee for 300g water on 1:16, got ${coffeeFor300}`);
     }
 
-    // Switch mode to "by_yield" (200ml beverage)
+    // Switch mode to "by_yield" (200ml cup)
     await page.locator('button[data-mode="by_yield"]').click();
     await page.locator('#amount-input').fill('200');
     await page.locator('#amount-input').dispatchEvent('input');
     const yieldYield = await page.locator('#out-yield').textContent();
     if (yieldYield.includes('200')) {
-      passed.push('Mode "by_yield" achieves target beverage yield with absorption offset');
+      passed.push('Mode "by_yield" achieves target beverage yield with absorption compensation');
     } else {
       issues.push(`Expected ~200ml yield, got ${yieldYield}`);
     }
 
-    // Suite 3: Pulse Pour Timer & Step Progression
+    // Suite 3: Pulse Pour Timer & Audio Step Progression
     console.log('\n--- Suite 3: Pulse Pour Timer ---');
     const stepRowsCount = await page.locator('.pulse-step-row').count();
     if (stepRowsCount > 0) {
@@ -170,7 +198,7 @@ async function runBrewRatioQCAudit() {
     await page.waitForTimeout(2100); // Wait 2 seconds
     const timerDigits = await page.locator('#timer-digits').textContent();
     if (timerDigits !== '00:00' && timerDigits.includes('00:0')) {
-      passed.push(`Timer successfully ticks while running (${timerDigits})`);
+      passed.push(`Timer ticks smoothly during brew session (${timerDigits})`);
     } else {
       issues.push(`Timer failed to advance: "${timerDigits}"`);
     }
@@ -187,11 +215,11 @@ async function runBrewRatioQCAudit() {
     // Suite 4: Responsive Viewport & Zero Horizontal Overflow
     console.log('\n--- Suite 4: Responsive Viewport & Overflow Audit ---');
     const viewports = [
-      { name: 'Mobile Small', width: 320, height: 568 },
-      { name: 'Mobile Standard', width: 375, height: 667 },
-      { name: 'Mobile Large', width: 414, height: 896 },
-      { name: 'Tablet Portrait', width: 768, height: 1024 },
-      { name: 'Desktop HD', width: 1280, height: 800 },
+      { name: 'iPhone SE (320px)', width: 320, height: 568 },
+      { name: 'iPhone 13/14 (390px)', width: 390, height: 844 },
+      { name: 'Pixel 7 (412px)', width: 412, height: 915 },
+      { name: 'iPad / Tablet (768px)', width: 768, height: 1024 },
+      { name: 'Desktop HD (1280px)', width: 1280, height: 800 },
     ];
 
     for (const vp of viewports) {
@@ -203,10 +231,10 @@ async function runBrewRatioQCAudit() {
       });
 
       if (!hasHorizontalScroll) {
-        passed.push(`Viewport ${vp.name} (${vp.width}px): 0 horizontal scroll overflow`);
+        passed.push(`Viewport ${vp.name}: 0 horizontal scroll overflow`);
       } else {
         const scrollW = await page.evaluate(() => document.documentElement.scrollWidth);
-        issues.push(`Viewport ${vp.name} (${vp.width}px) has overflow: scrollWidth=${scrollW}`);
+        issues.push(`Viewport ${vp.name} has overflow: scrollWidth=${scrollW}`);
       }
     }
 
@@ -216,7 +244,7 @@ async function runBrewRatioQCAudit() {
     for (const p of testPages) {
       const res = await page.goto(`${baseUrl}${p}`);
       if (res.status() === 200 || (p.includes('404') && res.status() === 404)) {
-        passed.push(`Route ${p} rendered status ${res.status()}`);
+        passed.push(`Route ${p} returned valid status ${res.status()}`);
       } else {
         issues.push(`Route ${p} failed with status ${res.status()}`);
       }

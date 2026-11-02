@@ -7,6 +7,8 @@ export interface PulseScheduleInput {
   bloomTimeSec?: number;
 }
 
+const GRAMS_TO_OZ = 0.035274;
+
 export function generatePulseSchedule(input: PulseScheduleInput): PulseScheduleResult {
   const { pulseMethodId, totalWaterGrams, coffeeGrams } = input;
   const bloomTime = input.bloomTimeSec ?? 45;
@@ -25,41 +27,48 @@ export function generatePulseSchedule(input: PulseScheduleInput): PulseScheduleR
 
     steps.push({
       stepIndex: 1,
-      name: 'Ủ cà phê (Bloom)',
+      name: 'Bloom (Pre-wetting)',
       waterAmountGrams: bloomWater,
+      waterAmountOz: Math.round(bloomWater * GRAMS_TO_OZ * 10) / 10,
       cumulativeWaterGrams: bloomWater,
+      cumulativeWaterOz: Math.round(bloomWater * GRAMS_TO_OZ * 10) / 10,
       startSec: 0,
       durationSec: bloomTime,
-      note: 'Rót đều từ tâm xoắn ốc ra ngoài để làm ướt đều bột cà phê và thoát khí CO2.',
+      note: 'Pour gently outward from the center in spirals. Saturate all grounds to degas trapped CO2.',
     });
 
     const pulse1Start = bloomTime;
     const pulse1Duration = 45;
+    const cum1 = Math.round((bloomWater + pulse1Water) * 10) / 10;
     steps.push({
       stepIndex: 2,
-      name: 'Rót lần 1 (Pulse 1)',
+      name: 'First Pour (Acidity & Sweetness)',
       waterAmountGrams: pulse1Water,
-      cumulativeWaterGrams: Math.round((bloomWater + pulse1Water) * 10) / 10,
+      waterAmountOz: Math.round(pulse1Water * GRAMS_TO_OZ * 10) / 10,
+      cumulativeWaterGrams: cum1,
+      cumulativeWaterOz: Math.round(cum1 * GRAMS_TO_OZ * 10) / 10,
       startSec: pulse1Start,
       durationSec: pulse1Duration,
-      note: 'Rót dòng nước đều, ổn định để trích xuất tầng hương hoa quả và vị ngọt.',
+      note: 'Steady circular pour maintaining a calm brew slurry and optimal extraction temperature.',
     });
 
     const pulse2Start = pulse1Start + pulse1Duration;
     const pulse2Duration = 45;
     steps.push({
       stepIndex: 3,
-      name: 'Rót lần 2 (Pulse 2 - Về đích)',
+      name: 'Final Pour (Balance & Finish)',
       waterAmountGrams: pulse2Water,
+      waterAmountOz: Math.round(pulse2Water * GRAMS_TO_OZ * 10) / 10,
       cumulativeWaterGrams: totalWaterGrams,
+      cumulativeWaterOz: Math.round(totalWaterGrams * GRAMS_TO_OZ * 10) / 10,
       startSec: pulse2Start,
       durationSec: pulse2Duration,
-      note: 'Rót nhẹ nhàng duy trì mực nước ổn định, chờ nước rút hoàn toàn.',
+      note: 'Pour gently up to target water level. Allow full drawdown for a clean, balanced cup.',
     });
 
     return {
       pulseMethodId: 'three_stage',
-      pulseMethodName: 'Rót 3 Giai Đoạn (Chuẩn SCA)',
+      pulseMethodName: 'SCA 3-Stage Pour (Recommended)',
       totalTimeSec: pulse2Start + pulse2Duration,
       totalWaterGrams,
       steps,
@@ -80,27 +89,29 @@ export function generatePulseSchedule(input: PulseScheduleInput): PulseScheduleR
       let stageName = '';
       let note = '';
       if (i === 0) {
-        stageName = 'Lần 1 (Ủ - 40% Cân bằng chua/ngọt)';
-        note = 'Tetsu Kasuya 4:6: Quyết định độ cân bằng giữa vị chua thanh và độ ngọt.';
+        stageName = 'Pour 1 (Bloom — Acidity/Sweetness)';
+        note = 'First 40%: Determines the balance between bright acidity and sweetness.';
       } else if (i === 1) {
-        stageName = 'Lần 2 (40% Hoàn thành giai đoạn 1)';
-        note = 'Rót dòng tròn đều đặn, chờ nước rút gần hết trước khi rót tiếp.';
+        stageName = 'Pour 2 (Finish First 40%)';
+        note = 'Pour concentric circles and let bed draw down before next pour.';
       } else if (i === 2) {
-        stageName = 'Lần 3 (60% Điều chỉnh độ đậm Body)';
-        note = 'Bắt đầu giai đoạn 60% điều chỉnh độ đậm và hậu vị cà phê.';
+        stageName = 'Pour 3 (Start 60% — Strength & Body)';
+        note = 'Remaining 60%: Regulates body thickness and extraction strength.';
       } else if (i === 3) {
-        stageName = 'Lần 4 (60% Tiếp tục)';
-        note = 'Duy trì chiết xuất sâu không để khô bã cà phê.';
+        stageName = 'Pour 4 (Continue 60% Extraction)';
+        note = 'Keep water temperature consistent; do not let bed run dry.';
       } else {
-        stageName = 'Lần 5 (Về đích đủ nước)';
-        note = 'Rót mốc nước cuối cùng và chờ chiết xuất hoàn tất.';
+        stageName = 'Pour 5 (Final Target Pour)';
+        note = 'Complete target water volume and allow full drawdown.';
       }
 
       steps.push({
         stepIndex: i + 1,
         name: stageName,
         waterAmountGrams: amount,
+        waterAmountOz: Math.round(amount * GRAMS_TO_OZ * 10) / 10,
         cumulativeWaterGrams: cumulative,
+        cumulativeWaterOz: Math.round(cumulative * GRAMS_TO_OZ * 10) / 10,
         startSec: i * stepDuration,
         durationSec: stepDuration,
         note,
@@ -109,43 +120,30 @@ export function generatePulseSchedule(input: PulseScheduleInput): PulseScheduleR
 
     return {
       pulseMethodId: 'four_six',
-      pulseMethodName: 'Phương pháp 4:6 (Tetsu Kasuya)',
+      pulseMethodName: 'Tetsu Kasuya 4:6 Method',
       totalTimeSec: 5 * stepDuration,
       totalWaterGrams,
       steps,
     };
   }
 
-  // Default: single_pour
-  const bloomWater = Math.min(totalWaterGrams, Math.round(coffeeGrams * 3 * 10) / 10);
-  const mainPourWater = Math.max(0, Math.round((totalWaterGrams - bloomWater) * 10) / 10);
-  const mainStart = bloomTime;
-  const mainDuration = 90;
-
+  // Fallback: Single Pour
   steps.push({
     stepIndex: 1,
-    name: 'Ủ cà phê (Bloom)',
-    waterAmountGrams: bloomWater,
-    cumulativeWaterGrams: bloomWater,
-    startSec: 0,
-    durationSec: bloomTime,
-    note: 'Làm ướt đều toàn bộ bề mặt cà phê, chờ khí CO2 thoát ra hết.',
-  });
-
-  steps.push({
-    stepIndex: 2,
-    name: 'Rót chính (Main Pour)',
-    waterAmountGrams: mainPourWater,
+    name: 'Continuous Pour (Single Stream)',
+    waterAmountGrams: totalWaterGrams,
+    waterAmountOz: Math.round(totalWaterGrams * GRAMS_TO_OZ * 10) / 10,
     cumulativeWaterGrams: totalWaterGrams,
-    startSec: mainStart,
-    durationSec: mainDuration,
-    note: 'Rót vòng tròn đồng tâm liên tục cho đến khi đạt tổng lượng nước mục tiêu.',
+    cumulativeWaterOz: Math.round(totalWaterGrams * GRAMS_TO_OZ * 10) / 10,
+    startSec: 0,
+    durationSec: 180,
+    note: 'Steady continuous pour across coffee bed until target weight is reached.',
   });
 
   return {
     pulseMethodId: 'single_pour',
-    pulseMethodName: 'Rót một lần (Continuous Pour)',
-    totalTimeSec: mainStart + mainDuration,
+    pulseMethodName: 'Single Continuous Pour',
+    totalTimeSec: 180,
     totalWaterGrams,
     steps,
   };

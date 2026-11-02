@@ -3,6 +3,7 @@ export type BrewMethodId =
   | 'french_press'
   | 'aeropress'
   | 'chemex'
+  | 'drip_machine'
   | 'cold_brew'
   | 'vietnamese_phin'
   | 'espresso'
@@ -28,7 +29,7 @@ export interface MethodConfig {
   defaultBloomTimeSec: number;
   recommendedGrind: string;
   defaultBrewTimeSec: number;
-  waterTempC: string;
+  waterTemp: string; // e.g. "195°F - 205°F (91°C - 96°C)"
 }
 
 export interface BrewCalcInput {
@@ -43,16 +44,19 @@ export interface BrewCalcResult {
   methodId: BrewMethodId;
   methodName: string;
   coffeeGrams: number;
+  coffeeOz: number;
   waterGrams: number;
+  waterOz: number;
   ratio: number;
   ratioText: string;
   estimatedYieldMl: number;
+  estimatedYieldOz: number;
   bloomWaterGrams: number;
   bloomTimeSec: number;
   recommendedGrind: string;
   targetBrewTimeSec: number;
   targetBrewTimeText: string;
-  waterTempC: string;
+  waterTemp: string;
   waterRetentionGrams: number;
 }
 
@@ -60,7 +64,9 @@ export interface PulseStep {
   stepIndex: number;
   name: string;
   waterAmountGrams: number;
+  waterAmountOz: number;
   cumulativeWaterGrams: number;
+  cumulativeWaterOz: number;
   startSec: number;
   durationSec: number;
   note: string;
