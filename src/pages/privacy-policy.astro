@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config';
+---
+
+<BaseLayout
+  title={`Chính Sách Bảo Mật | ${site.name}`}
+  description="Chính sách bảo mật của BrewRatio: cam kết không thu thập dữ liệu cá nhân (Zero PII), không dùng cookie theo dõi."
+>
+  <div class="wrap" style="padding: 48px 20px 80px; max-width: 820px;">
+    <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 24px;">
+      Chính Sách Bảo Mật (Privacy Policy)
+    </h1>
+
+    <div class="card" style="display:flex; flex-direction:column; gap:20px; font-size:1rem; line-height:1.7; color:var(--color-text-muted);">
+      <div>
+        <h2 style="font-size:1.25rem; font-weight:800; color:var(--color-espresso); margin-bottom:8px;">
+          1. Cam Kết Quyền Riêng Tư Tối Đa
+        </h2>
+        <p>
+          {site.name} là ứng dụng web tĩnh chạy hoàn toàn phía client (trình duyệt thiết bị của bạn). Chúng tôi không lưu trữ, thu thập hoặc gửi bất kỳ dữ liệu cá nhân nào lên máy chủ máy chủ của chúng tôi.
+        </p>
+      </div>
+
+      <div>
+        <h2 style="font-size:1.25rem; font-weight:800; color:var(--color-espresso); margin-bottom:8px;">
+          2. Dữ Liệu Tính Toán
+        </h2>
+        <p>
+          Tất cả các tham số bạn nhập (khối lượng cà phê, lượng nước, phương pháp pha, thời gian) đều được xử lý cục bộ ngay trên bộ nhớ RAM của trình duyệt thông qua TypeScript/JavaScript. Khi bạn đóng trình duyệt hoặc làm mới trang, các biến tạm thời này sẽ tự động xóa.
+        </p>
+      </div>
+
+      <div>
+        <h2 style="font-size:1.25rem; font-weight:800; color:var(--color-espresso); margin-bottom:8px;">
+          3. Không Sử Dụng Cookies Theo Dõi
+        </h2>
+        <p>
+          Trang web không thiết lập cookie theo dõi cá nhân. Nếu có sử dụng dịch vụ quảng cáo (Google AdSense), các đối tác bên thứ ba có thể sử dụng cookie để phân phối quảng cáo dựa trên các lượt truy cập trước đó của người dùng theo chính sách quyền riêng tư chuẩn của Google.
+        </p>
+      </div>
+
+      <div>
+        <h2 style="font-size:1.25rem; font-weight:800; color:var(--color-espresso); margin-bottom:8px;">
+          4. Liên Hệ
+        </h2>
+        <p>
+          Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật, vui lòng liên hệ đội ngũ phát triển qua email hỗ trợ của June Nine Studio.
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

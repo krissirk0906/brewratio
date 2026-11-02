@@ -1,0 +1,103 @@
+---
+import '../styles/global.css';
+import { site } from '../config';
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: object[];
+  noindex?: boolean;
+}
+
+const { title, description, jsonLd = [], noindex = false } = Astro.props;
+const base = (Astro.site ?? new URL('https://brewratio.pages.dev')).toString().replace(/\/$/, '');
+const path = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = `${base}${path}`;
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#24140E" />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+
+    {jsonLd.map((item) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(item)} />
+    ))}
+
+    {site.adsenseClient && (
+      <script
+        is:inline
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${site.adsenseClient}`}
+        crossorigin="anonymous"
+      />
+    )}
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/">
+          <div class="brand-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="1" x2="6" y2="4"/>
+              <line x1="10" y1="1" x2="10" y2="4"/>
+              <line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+          </div>
+          {site.name}
+        </a>
+        <nav class="site-nav" aria-label="Điều hướng chính">
+          <a href="/#calculator">Tính Tỷ Lệ</a>
+          <a href="/#timer">Đồng Hồ Rót</a>
+          <a href="/methodology/">Chuẩn SCA</a>
+          <a href="/about/">Về Chúng Tôi</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <div>
+          <p class="brand" style="margin-bottom: 6px;">
+            <span class="brand-icon" style="width:26px;height:26px;font-size:12px;">☕</span>
+            {site.name}
+          </p>
+          <p>{site.tagline}</p>
+          <p class="legal-disclaimer">
+            * V60, AeroPress và Chemex là nhãn hiệu đã đăng ký của các chủ sở hữu tương ứng. BrewRatio là ứng dụng công cụ độc lập, không liên kết hoặc chứng thực bởi các nhãn hiệu này.
+          </p>
+        </div>
+        <div class="footer-links">
+          <a href="/methodology/">Chuẩn Tỷ Lệ SCA</a>
+          <a href="/about/">Giới thiệu</a>
+          <a href="/privacy-policy/">Bảo mật</a>
+          <a href="/terms/">Điều khoản</a>
+        </div>
+      </div>
+      <div class="wrap" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border); font-size: 0.8rem; text-align: center;">
+        © {year} {site.name}. 100% Client-Side. Không lưu trữ cookie hay dữ liệu cá nhân.
+      </div>
+    </footer>
+  </body>
+</html>

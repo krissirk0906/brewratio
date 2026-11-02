@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config';
+---
+
+<BaseLayout
+  title={`404 - Không Tìm Thấy Trang | ${site.name}`}
+  description="Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển."
+  noindex={true}
+>
+  <div class="wrap" style="padding: 80px 20px; text-align: center; max-width: 600px;">
+    <div style="font-size: 4rem; margin-bottom: 16px;">☕💧</div>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+      404 - Cạn Ly!
+    </h1>
+    <p style="font-size: 1.1rem; color: var(--color-text-muted); margin-bottom: 28px;">
+      Trang bạn tìm kiếm có vẻ đã bị đổ hoặc chưa được pha. Hãy quay về bàn pha chế chính nhé!
+    </p>
+    <a href="/" class="btn-primary" style="text-decoration: none;">
+      Quay Về Trang Chủ
+    </a>
+  </div>
+</BaseLayout>

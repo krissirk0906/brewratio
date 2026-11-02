@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: 'Phương Pháp Luận & Khoa Học Tính Tỷ Lệ Pha Cà Phê Chuẩn SCA',
+    description: 'Chi tiết công thức vật lý, độ ngậm nước của bã cà phê và tỷ lệ vàng chiết xuất SCA Golden Cup Standard.',
+    author: {
+      '@type': 'Organization',
+      name: site.author,
+    },
+  },
+];
+---
+
+<BaseLayout
+  title={`Phương Pháp Luận & Khoa Học Chiết Xuất | ${site.name}`}
+  description="Khám phá các nguyên lý vật lý, công thức tính tỷ lệ pha cà phê, độ hấp thụ nước của bã và phương pháp rót phân đoạn Pulse Pouring."
+  jsonLd={jsonLd}
+>
+  <div class="wrap" style="padding: 48px 20px 80px; max-width: 820px;">
+    <div class="hero-badge">🔬 Khoa Học Chiết Xuất Cà Phê</div>
+    <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--color-espresso); line-height: 1.2; margin-bottom: 24px;">
+      Phương Pháp Luận & Tiêu Chuẩn SCA Golden Cup
+    </h1>
+
+    <div style="color: var(--color-text-muted); font-size: 1.05rem; line-height: 1.7; display: flex; flex-direction: column; gap: 24px;">
+      <section class="card">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          1. Tiêu chuẩn SCA Golden Cup là gì?
+        </h2>
+        <p>
+          Hiệp hội Cà phê Đặc sản (Specialty Coffee Association - SCA) xác định một tách cà phê đạt tiêu chuẩn "Golden Cup" khi đạt:
+        </p>
+        <ul style="margin-left: 20px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+          <li><strong>TDS (Total Dissolved Solids):</strong> 1.15% đến 1.45% chất rắn hòa tan trong nước.</li>
+          <li><strong>Extraction Yield (Hiệu suất chiết xuất):</strong> 18.0% đến 22.0% khối lượng cà phê được hòa tan.</li>
+          <li><strong>Brew Ratio chuẩn:</strong> 55g/L đến 60g/L nước (tương đương tỷ lệ 1:16 đến 1:18).</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          2. Công Thức Vật Lý Bù Trừ Bã Cà Phê (Grounds Absorption)
+        </h2>
+        <p>
+          Một sai lầm phổ biến khi tính toán là giả định: <em>Lượng nước rót = Lượng cà phê uống được trong cốc</em>.
+        </p>
+        <p style="margin-top: 8px;">
+          Trên thực tế, bột cà phê sau khi xay có cấu trúc xốp và giữ lại trung bình <strong>2.0g – 2.1g nước</strong> trên mỗi 1g bột khô.
+        </p>
+        <div style="background-color: var(--color-surface-subtle); border-left: 4px solid var(--color-crema); padding: 14px 18px; border-radius: 4px; margin-top: 10px; font-family: var(--font-mono); font-size: 0.95rem;">
+          Lượng Nước Thu Được (Yield) = Nước Rót - (Cà Phê Khô × 2.1)
+        </div>
+        <p style="margin-top: 10px;">
+          Khi bạn chọn chế độ <em>"Lượng uống thành phẩm"</em>, BrewRatio sẽ giải ngược phương trình để tính chính xác lượng nước bạn cần đun và rót vào phễu lọc để thu được đúng thể tích cà phê mong muốn.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          3. Kế Hoạch Rót Nước Phân Tầng (Pulse Pouring)
+        </h2>
+        <p>
+          Rót toàn bộ nước một lần (Continuous Pour) dễ làm bột cà phê nổi bồng bềnh và tạo dòng chảy tắt (channeling). Phương pháp rót ngắt quãng (Pulse Pouring) mang lại sự đồng đều vượt trội:
+        </p>
+        <ul style="margin-left: 20px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+          <li><strong>Giai đoạn Ủ (Bloom):</strong> Rót 2x – 3x nước so với bột, chờ 30-45 giây để CO2 thoát ra hoàn toàn.</li>
+          <li><strong>Phương pháp 4:6 (Tetsu Kasuya):</strong> Tách biệt 40% nước đầu (quyết định chua/ngọt) và 60% nước sau (quyết định độ đậm đà body).</li>
+          <li><strong>Phương pháp 3 Giai Đoạn (SCA 3-Stage):</strong> Bloom (20%) → Pulse 1 (40%) → Pulse 2 (40%) tối ưu độ đồng nhất nhiệt độ.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

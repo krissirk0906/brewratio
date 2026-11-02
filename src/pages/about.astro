@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: `Về Chúng Tôi — ${site.name}`,
+    description: 'Giới thiệu về BrewRatio: công cụ tính tỷ lệ pha cà phê thủ công chuẩn quốc tế và bộ đếm thời gian rót nước bảo vệ sự riêng tư.',
+  },
+];
+---
+
+<BaseLayout
+  title={`Về Chúng Tôi | ${site.name}`}
+  description="Tìm hiểu sứ mệnh của BrewRatio: mang khoa học chiết xuất cà phê chuẩn SCA đến mọi người pha chế tại gia và barista."
+  jsonLd={jsonLd}
+>
+  <div class="wrap" style="padding: 48px 20px 80px; max-width: 820px;">
+    <div class="hero-badge">☕ Về Dự Án</div>
+    <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--color-espresso); line-height: 1.2; margin-bottom: 24px;">
+      Về {site.name}
+    </h1>
+
+    <div style="color: var(--color-text-muted); font-size: 1.05rem; line-height: 1.7; display: flex; flex-direction: column; gap: 24px;">
+      <section class="card">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          Sứ Mệnh Của Chúng Tôi
+        </h2>
+        <p>
+          Pha một tách cà phê thủ công thơm ngon (Pour-over V60, French Press, AeroPress, Phin...) không phải là điều bí ẩn hay may rủi. Đó là sự hòa quyện chính xác giữa <strong>tỷ lệ khối lượng nước / bột</strong>, <strong>thời gian tiếp xúc</strong>, và <strong>kế hoạch rót phân tầng</strong>.
+        </p>
+        <p style="margin-top: 10px;">
+          {site.name} được phát triển nhằm mục đích biến các nguyên lý phức tạp của chuẩn SCA Golden Cup và kỹ thuật rót 4:6 thành công cụ trực quan, tức thì và hoàn toàn miễn phí.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          Quyền Riêng Tư & Client-Side 100%
+        </h2>
+        <p>
+          Khác với nhiều ứng dụng yêu cầu đăng nhập tài khoản, cài đặt app nặng nề hoặc gửi dữ liệu lên server, {site.name} hoạt động 100% trong trình duyệt của bạn (Static Web App).
+        </p>
+        <ul style="margin-left: 20px; margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+          <li>Không theo dõi thông tin nhận dạng cá nhân (Zero PII).</li>
+          <li>Không sử dụng cookies gây phiền toái.</li>
+          <li>Chuông âm thanh được tổng hợp thời gian thực bằng Web Audio API, không tải file nặng ngoài.</li>
+          <li>Tốc độ tải trang dưới 0.5 giây trên mọi thiết bị di động.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--color-espresso); margin-bottom: 12px;">
+          Thông Tin Pháp Lý & Thương Hiệu
+        </h2>
+        <p>
+          V60, Chemex, AeroPress, French Press là các nhãn hiệu hoặc tên gọi thiết bị pha chế thuộc quyền sở hữu của các tổ chức tương ứng. {site.name} là ứng dụng hỗ trợ tính toán độc lập, tôn trọng bản quyền và cung cấp kiến thức giáo dục mở cho cộng đồng người yêu cà phê.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
