@@ -47,6 +47,15 @@ const year = new Date().getFullYear();
         crossorigin="anonymous"
       />
     )}
+
+    {site.analyticsToken && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: site.analyticsToken })}
+      />
+    )}
   </head>
   <body>
     <header class="site-header">

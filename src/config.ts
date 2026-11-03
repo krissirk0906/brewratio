@@ -14,5 +14,6 @@ export const site: SiteConfig = {
   description: 'Precision coffee brewing ratio calculator and pulse pour timer for V60, French Press, AeroPress, Chemex, Drip Machine, and Cold Brew. Built to SCA Golden Cup standards with dual metric/imperial units.',
   url: 'https://brewratio.pages.dev',
   adsenseClient: 'ca-pub-2321353976447632',
+  analyticsToken: import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN || '',
   author: 'June Nine Studio',
 };
