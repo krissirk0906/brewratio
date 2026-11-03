@@ -31,7 +31,7 @@ jobs:
         env:
           SITE_URL: ${{ secrets.SITE_URL || 'https://brewratio.pages.dev' }}
           PUBLIC_ADSENSE_CLIENT: ${{ secrets.PUBLIC_ADSENSE_CLIENT || 'ca-pub-2321353976447632' }}
-          PUBLIC_CF_ANALYTICS_TOKEN: ${{ secrets.PUBLIC_CF_ANALYTICS_TOKEN || '' }}
+          PUBLIC_CF_ANALYTICS_TOKEN: ${{ secrets.PUBLIC_CF_ANALYTICS_TOKEN || 'ce2919ca1f304e5c9a7375b90bd9d1cd' }}
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
